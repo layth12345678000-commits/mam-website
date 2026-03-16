@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إلى أمي الغالية | عيد الأم</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=El+Messiri:wght@400;500;600;700&family=Dancing+Script:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💝</text></svg>">
+</head>
+<body>
+    <!-- خلفية بالقلوب -->
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <!-- شاشة التحميل -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader">
+            <div class="loader-spinner"></div>
+            <p>يا هلا بأغلى إنسانة... تجهز المفاجأة 💝</p>
+        </div>
+    </div>
+
+    <!-- زر الموسيقى -->
+    <button class="music-btn" id="musicBtn">
+        <i class="fas fa-music"></i>
+    </button>
+
+    <!-- شاشة تسجيل البيانات (تظهر أول ما يدخل) -->
+    <div class="screen-register" id="registerScreen">
+        <div class="register-card">
+            <h2>🎁 اصنع هديتك الخاصة</h2>
+            <p>اكتب اسمك واسم أمك عشان تاخذ رابط مخصص</p>
+            
+            <div class="input-group">
+                <label>اسمك أنت</label>
+                <input type="text" id="sonName" placeholder="مثال: أحمد" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label>اسم أمك</label>
+                <input type="text" id="motherName" placeholder="مثال: فاطمة" autocomplete="off">
+            </div>
+            
+            <button class="generate-btn" onclick="generateLink()">
+                <i class="fas fa-magic"></i>
+                <span>اصنع الرابط السحري</span>
+            </button>
+            
+            <div class="link-box" id="linkBox" style="display: none;">
+                <p>✨ رابطك الخاص ✨</p>
+                <div class="generated-link" id="generatedLink"></div>
+                <button class="copy-btn" onclick="copyLink()">
+                    <i class="fas fa-copy"></i>
+                    <span>انسخ الرابط</span>
+                </button>
+                <button class="preview-btn" onclick="previewSite()">
+                    <i class="fas fa-eye"></i>
+                    <span>جرب تشوف كيف بيطلع</span>
+                </button>
+            </div>
+            
+            <p style="color: var(--teal-wave); margin-top: 1rem; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> 
+                بعد ما تنسخ الرابط، أرسله لأمك عشان تفتحه وتشوف المفاجأة
+            </p>
+        </div>
+    </div>
+
+    <!-- الشاشة 1: الاستقبال (بتظهر بعد ما يدخل من الرابط) -->
+    <section class="screen screen-1" id="screen1">
+        <div class="screen-content">
+            <div class="welcome-card">
+                <div class="welcome-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                
+                <h1>أمي الغالية</h1>
+                <h2 id="motherNameDisplay">يا أجمل إنسانة</h2>
+                
+                <div class="name-display">
+                    <p>من <span id="sonNameDisplay">ابنك</span> إليكِ</p>
+                </div>
+                
+                <div class="message-preview">
+                    <p>" أمي... كلمة صغيرة لكن معناها كبير "</p>
+                    <p class="small">سويت لك شي بسيط من القلب</p>
+                    <p class="small">عشان تفرحي وتنبهري شوي 🤗</p>
+                </div>
+                
+                <button class="begin-btn" onclick="startJourney()">
+                    <span>تعالي نبدأ الرحلة</span>
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- الشاشة 2: الكعكة -->
+    <section class="screen screen-2" id="screen2">
+        <button class="back-btn" onclick="goToScreen(1)">
+            <i class="fas fa-arrow-right"></i>
+            <span>رجوع</span>
+        </button>
+        
+        <div class="screen-content">
+            <div class="cake-card">
+                <div class="cake-header">
+                    <h2>🎂 كل عام وأنتِ بخير يا <span id="motherNameCake">أمي</span></h2>
+                    <p>أطفئي الشمعات وبتشوفي المفاجأة</p>
+                </div>
+                
+                <div class="cake-container">
+                    <div class="cake">
+                        <div class="cake-layer layer1"></div>
+                        <div class="cake-layer layer2"></div>
+                        <div class="cake-layer layer3"></div>
+                        
+                        <div class="icing">
+                            <div class="icing-drip"></div>
+                            <div class="icing-drip"></div>
+                            <div class="icing-drip"></div>
+                            <div class="icing-drip"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="candles-wrapper" id="candlesWrapper">
+                        <!-- هنا تظهر الشمعات بالجافاسكريبت -->
+                    </div>
+                </div>
+                
+                <div class="candles-counter">
+                    <p class="counter-text">شمعات باقي:</p>
+                    <span class="counter-number" id="candlesLeft">3</span>
+                    <span class="counter-total">/3</span>
+                </div>
+                
+                <div class="after-cake-message" id="afterCakeMessage">
+                    <p>✨ ماشاء الله! أطفأتي كل الشمعات ✨</p>
+                    <button class="continue-to-letter" onclick="goToScreen(3)">
+                        <span>شوفي الرسالة</span>
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الشاشة 3: الرسالة -->
+    <section class="screen screen-3" id="screen3">
+        <button class="back-btn" onclick="goToScreen(2)">
+            <i class="fas fa-arrow-right"></i>
+            <span>رجوع</span>
+        </button>
+        
+        <div class="screen-content">
+            <div class="letter-card">
+                <div class="letter-header">
+                    <h2>رسالتي لكِ يا <span id="motherNameLetter">أمي</span></h2>
+                    <div class="letter-date">عيد الأم - ٢١ مارس ٢٠٢٤</div>
+                </div>
+                
+                <div class="letter-body" id="letterBody">
+                    <!-- المحتوى يتعبأ بالجافاسكريبت -->
+                </div>
+                
+                <div class="letter-signature">
+                    <div class="signature-name" id="signatureName">ابنك</div>
+                    <div class="signature-title">اللي يحبك أكثر من أي شي في الدنيا</div>
+                </div>
+                
+                <div class="letter-footer">
+                    <p>« وَقَضَىٰ رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَانًا »</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="continue-to-letter" onclick="goToScreen(4)" style="background: var(--teal-wave);">
+                        <span>للختام</span>
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الشاشة 4: الختام -->
+    <section class="screen screen-4" id="screen4">
+        <div class="screen-content">
+            <div class="final-card">
+                <div class="final-icon">💝</div>
+                
+                <h2>شكرًا لأنكِ <span id="motherNameFinal">أمي</span></h2>
+                
+                <div class="final-quote" id="finalQuote">
+                    " أمي... يا أول كلمة نطقتها، وآخر كلمة رح أقولها "
+                </div>
+                
+                <div class="final-message">
+                    <p>أنتِ النعمة اللي ما تتكرر، والحب اللي ما يخلص، والأمان اللي ما يفارق.</p>
+                </div>
+                
+                <button class="restart-btn" onclick="restartJourney()">
+                    <i class="fas fa-redo-alt"></i>
+                    <span>عيشي الرحلة مرة ثانية</span>
+                </button>
+                
+                <p style="color: var(--teal-wave); margin-top: 2rem;">
+                    <i class="fas fa-heart" style="color: var(--deep-rose);"></i> 
+                    كل عام وأنتِ بخير يا <span id="motherNameFooter">أمي</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- لوحة التحكم -->
+    <div class="control-panel collapsed" id="controlPanel">
+        <button class="panel-toggle" onclick="togglePanel()">
+            <i class="fas fa-cog"></i>
+        </button>
+        
+        <div class="panel-content">
+            <div class="progress-tracker">
+                <div class="tracker-dots">
+                    <span class="tracker-dot active" data-screen="1" onclick="goToScreen(1)">١</span>
+                    <span class="tracker-dot" data-screen="2" onclick="goToScreen(2)">٢</span>
+                    <span class="tracker-dot" data-screen="3" onclick="goToScreen(3)">٣</span>
+                    <span class="tracker-dot" data-screen="4" onclick="goToScreen(4)">٤</span>
+                </div>
+                <div class="tracker-text" id="screenIndicator">الاستقبال</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- عنصر الصوت -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="ame.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

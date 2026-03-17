@@ -47,12 +47,12 @@
             
             <div class="input-group">
                 <label>اسم أمك</label>
-                <input type="text" id="motherName" placeholder="مثال: فاطمة" autocomplete="off">
+                <input type="text" id="motherName" placeholder="مثال: فاطمة او اي دلع " autocomplete="off">
             </div>
             
             <button class="generate-btn" onclick="generateLink()">
                 <i class="fas fa-magic"></i>
-                <span>اصنع الرابط السحري</span>
+                <span>اصنع الرابط النهائي </span>
             </button>
             
             <div class="link-box" id="linkBox" style="display: none;">
@@ -87,13 +87,13 @@
                 <h2 id="motherNameDisplay">يا أجمل إنسانة</h2>
                 
                 <div class="name-display">
-                    <p>من <span id="sonNameDisplay">ابنك</span> إليكِ</p>
+                    <p>من <span id="sonNameDisplay">ابنك</span> إليكِ انتي</p>
                 </div>
                 
                 <div class="message-preview">
                     <p>" أمي... كلمة صغيرة لكن معناها كبير "</p>
                     <p class="small">سويت لك شي بسيط من القلب</p>
-                    <p class="small">عشان تفرحي وتنبهري شوي 🤗</p>
+                    <p class="small">عشان تفرحي وتنبهري  🤗</p>
                 </div>
                 
                 <button class="begin-btn" onclick="startJourney()">
@@ -144,9 +144,9 @@
                 </div>
                 
                 <div class="after-cake-message" id="afterCakeMessage">
-                    <p>✨ ماشاء الله! أطفأتي كل الشمعات ✨</p>
+                    <p>✨ يلا يا عمري اضغطي👇 ✨</p>
                     <button class="continue-to-letter" onclick="goToScreen(3)">
-                        <span>شوفي الرسالة</span>
+                        <span>و شوفي الرسااااااله </span>
                         <i class="fas fa-envelope"></i>
                     </button>
                 </div>
@@ -165,7 +165,8 @@
             <div class="letter-card">
                 <div class="letter-header">
                     <h2>رسالتي لكِ يا <span id="motherNameLetter">أمي</span></h2>
-                    <div class="letter-date">عيد الأم - ٢١ مارس ٢٠٢٤</div>
+                    <div class="letter-date">في عيد الام</div>
+                    <div class="letter-date"> تاريخ 2026 مارس 21 </div>
                 </div>
                 
                 <div class="letter-body" id="letterBody">
@@ -200,7 +201,7 @@
                 <h2>شكرًا لأنكِ <span id="motherNameFinal">أمي</span></h2>
                 
                 <div class="final-quote" id="finalQuote">
-                    " أمي... يا أول كلمة نطقتها، وآخر كلمة رح أقولها "
+                    " اللهم كما جعلت الجنة تحت قدميها، اجعل السعادة تملأ قلبها، <br> وبارك لي في عمرها ولا تحرمني قربها "
                 </div>
                 
                 <div class="final-message">
@@ -229,10 +230,10 @@
         <div class="panel-content">
             <div class="progress-tracker">
                 <div class="tracker-dots">
-                    <span class="tracker-dot active" data-screen="1" onclick="goToScreen(1)">١</span>
-                    <span class="tracker-dot" data-screen="2" onclick="goToScreen(2)">٢</span>
-                    <span class="tracker-dot" data-screen="3" onclick="goToScreen(3)">٣</span>
-                    <span class="tracker-dot" data-screen="4" onclick="goToScreen(4)">٤</span>
+                    <span class="tracker-dot active" data-screen="1" onclick="goToScreen(1)">1</span>
+                    <span class="tracker-dot" data-screen="2" onclick="goToScreen(2)">2</span>
+                    <span class="tracker-dot" data-screen="3" onclick="goToScreen(3)">3</span>
+                    <span class="tracker-dot" data-screen="4" onclick="goToScreen(4)">4</span>
                 </div>
                 <div class="tracker-text" id="screenIndicator">الاستقبال</div>
             </div>

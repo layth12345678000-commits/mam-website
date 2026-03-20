@@ -1,25 +1,79 @@
 // ==================== المتغيرات العامة ====================
-let currentScreen = 1;
-let candlesLit = 3;
+let currentScreen = 0;
+let candlesLit = 4;
 let musicPlaying = false;
 let sonName = '';
 let motherName = '';
+let personalMessage = '';
+let heartClickCount = 0;
+let clickedDua = [false, false, false];
+let selectedTheme = 'theme1';
+let selectedFont = 'tajawal';
+
+// تعريف الثيمات الستة (متنوعة تناسب كل الأذواق)
+const themes = {
+    theme1: { // ثيم الغروب - دافئ وحيوي
+        primary: '#FF6B6B',
+        secondary: '#FFE66D',
+        accent1: '#4ECDC4',
+        accent2: '#FF9F1C',
+        name: 'الغروب'
+    },
+    theme2: { // ثيم البنفسجي - رومانسي وناعم
+        primary: '#9b5de6',
+        secondary: '#ff9eb5',
+        accent1: '#b5e6e6',
+        accent2: '#ffe27a',
+        name: 'البنفسجي'
+    },
+    theme3: { // ثيم المحيط - هادئ ومنعش
+        primary: '#00B4D8',
+        secondary: '#90E0EF',
+        accent1: '#0077B6',
+        accent2: '#CAF0F8',
+        name: 'المحيط'
+    },
+    theme4: { // ثيم الدفء - ألوان ترابية دافئة
+        primary: '#c44569',
+        secondary: '#f19066',
+        accent1: '#e66767',
+        accent2: '#f5cd79',
+        name: 'الدفء'
+    },
+    theme5: { // ثيم الفخامة - ألوان عميقة راقية
+        primary: '#6C5B7B',
+        secondary: '#F8A5C2',
+        accent1: '#F3D1B0',
+        accent2: '#A8D5BA',
+        name: 'الفخامة'
+    },
+    theme6: { // ثيم النعومة - ألوان pastel محبوبة
+        primary: '#A8E6CF',
+        secondary: '#FFD3B6',
+        accent1: '#FFAAA5',
+        accent2: '#FF8B94',
+        name: 'النعومة'
+    }
+};
 
 // عناصر الصفحة
 const bgMusic = document.getElementById('bgMusic');
-const musicBtn = document.getElementById('musicBtn');
 const loadingScreen = document.getElementById('loadingScreen');
-const registerScreen = document.getElementById('registerScreen');
 const screens = document.querySelectorAll('.screen');
 const candlesWrapper = document.getElementById('candlesWrapper');
 const afterCakeMessage = document.getElementById('afterCakeMessage');
 const candlesLeftSpan = document.getElementById('candlesLeft');
+const loveWordContainer = document.getElementById('loveWordContainer');
+const growingHeart = document.getElementById('growingHeart');
+const heartCircle = document.getElementById('heartCircle');
+const heartCounter = document.getElementById('heartCounter');
+const goToFinalBtn = document.getElementById('goToFinalBtn');
+const musicBtn = document.getElementById('musicBtn');
+const musicIcon = document.getElementById('musicIcon');
 
 // ==================== بداية التشغيل ====================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('💝 موقع أمي - بدأ التشغيل');
-    
-    // إخفاء شاشة التحميل بعد ثانيتين
+    // إخفاء شاشة التحميل
     setTimeout(() => {
         if (loadingScreen) {
             loadingScreen.style.opacity = '0';
@@ -35,17 +89,188 @@ document.addEventListener('DOMContentLoaded', function() {
     // إنشاء قلوب متحركة
     createFloatingHearts();
 
-    // تحديث مؤشر التقدم
-    updateProgressTracker();
-
     // معالجة الرابط
     initFromURL();
-
-    // إضافة مستمع لزر الموسيقى
-    if (musicBtn) {
-        musicBtn.addEventListener('click', toggleMusic);
-    }
+    
+    // تفعيل الثيم الافتراضي
+    selectTheme('theme1');
 });
+
+// ==================== إنشاء قلوب متحركة ====================
+function createFloatingHearts() {
+    const container = document.getElementById('floatingHearts');
+    if (!container) return;
+    
+    for (let i = 0; i < 20; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart-particle';
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDelay = Math.random() * 5 + 's';
+        heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+        container.appendChild(heart);
+    }
+}
+
+// ==================== إنشاء الشمعات ====================
+function createCandles() {
+    if (!candlesWrapper) return;
+    
+    candlesWrapper.innerHTML = '';
+    
+    for (let i = 1; i <= 4; i++) {
+        const candle = document.createElement('div');
+        candle.className = 'candle';
+        candle.id = `candle${i}`;
+        
+        candle.innerHTML = `
+            <div class="candle-body"></div>
+            <div class="wick"></div>
+            <div class="flame lit" id="flame${i}" onclick="blowCandle(${i})">
+                <div class="flame-inner"></div>
+            </div>
+        `;
+        
+        candlesWrapper.appendChild(candle);
+    }
+    
+    candlesLit = 4;
+    updateCandlesCounter();
+}
+
+// ==================== إطفاء الشموع ====================
+function blowCandle(candleNumber) {
+    const flame = document.getElementById(`flame${candleNumber}`);
+    const candle = document.getElementById(`candle${candleNumber}`);
+    
+    if (!flame || !flame.classList.contains('lit')) return;
+    
+    flame.classList.remove('lit');
+    flame.style.display = 'none';
+    
+    // تأثيرات مختلفة
+    if (candle) {
+        if (candleNumber === 1) {
+            candle.style.animation = 'flyAway 0.6s ease-out forwards';
+        } else if (candleNumber === 2) {
+            candle.style.animation = 'explodeEffect 0.6s ease-out forwards';
+            createStarEffect(candle);
+        } else if (candleNumber === 3) {
+            candle.style.animation = 'jumpEffect 0.6s ease-out forwards';
+        } else if (candleNumber === 4) {
+            candle.style.animation = 'heartTransform 0.6s ease-out forwards';
+            createHeartEffect(candle);
+        }
+    }
+    
+    // إظهار كلمة بحبك
+    showLoveWord();
+    
+    candlesLit--;
+    playSound('blow');
+    updateCandlesCounter();
+    
+    if (candlesLit === 0 && afterCakeMessage) {
+        setTimeout(() => {
+            afterCakeMessage.style.opacity = '1';
+            playSound('win');
+        }, 800);
+    }
+}
+
+function showLoveWord() {
+    if (!loveWordContainer) return;
+    
+    loveWordContainer.innerHTML = '';
+    
+    const word = document.createElement('div');
+    word.className = 'love-word';
+    
+    // ألوان حسب الثيم
+    const theme = themes[selectedTheme];
+    const colors = [theme.primary, theme.secondary, theme.accent1, theme.accent2];
+    word.style.color = colors[candlesLit - 1];
+    word.textContent = 'بحبك';
+    
+    loveWordContainer.appendChild(word);
+    
+    setTimeout(() => {
+        loveWordContainer.innerHTML = '';
+    }, 1000);
+}
+
+function createStarEffect(candle) {
+    const rect = candle.getBoundingClientRect();
+    for (let i = 0; i < 12; i++) {
+        const star = document.createElement('div');
+        star.style.position = 'fixed';
+        star.style.left = (rect.left + rect.width/2) + 'px';
+        star.style.top = (rect.top) + 'px';
+        star.style.width = '15px';
+        star.style.height = '15px';
+        star.style.background = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        star.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+        star.style.animation = 'rain 1s linear forwards';
+        star.style.zIndex = '1000';
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 1000);
+    }
+}
+
+function createHeartEffect(candle) {
+    const rect = candle.getBoundingClientRect();
+    for (let i = 0; i < 10; i++) {
+        const heart = document.createElement('div');
+        heart.style.position = 'fixed';
+        heart.style.left = (rect.left + rect.width/2) + 'px';
+        heart.style.top = (rect.top) + 'px';
+        heart.style.color = '#ff69b4';
+        heart.style.fontSize = '2rem';
+        heart.innerHTML = '❤️';
+        heart.style.animation = 'rain 1s linear forwards';
+        heart.style.zIndex = '1000';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    }
+}
+
+function updateCandlesCounter() {
+    if (candlesLeftSpan) candlesLeftSpan.textContent = candlesLit;
+}
+
+// ==================== دوال اختيار الثيم والخط ====================
+function selectTheme(themeId) {
+    // إزالة التحديد من كل الثيمات
+    document.querySelectorAll('.theme-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    
+    // إضافة التحديد للثيم المختار
+    const selectedElement = document.querySelector(`[data-theme="${themeId}"]`);
+    if (selectedElement) {
+        selectedElement.classList.add('selected');
+    }
+    
+    // حفظ الثيم المختار
+    selectedTheme = themeId;
+    
+    // تطبيق الثيم على المعاينة إذا كان في وضع المعاينة
+    const theme = themes[themeId];
+    if (theme) {
+        document.documentElement.style.setProperty('--primary', theme.primary);
+        document.documentElement.style.setProperty('--secondary', theme.secondary);
+        document.documentElement.style.setProperty('--accent1', theme.accent1);
+        document.documentElement.style.setProperty('--accent2', theme.accent2);
+    }
+}
+
+function selectFont(fontName) {
+    selectedFont = fontName;
+    
+    // تغيير خط الجسم
+    document.body.className = '';
+    document.body.classList.add(`font-${fontName}`);
+}
 
 // ==================== معالجة الرابط ====================
 function getParamsFromURL() {
@@ -53,44 +278,63 @@ function getParamsFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         sonName = urlParams.get('from') || '';
         motherName = urlParams.get('to') || '';
+        personalMessage = urlParams.get('msg') || '';
         
-        // تنظيف الأسماء من الرموز الخاصة
+        // قراءة الثيم والخط من الرابط
+        const themeParam = urlParams.get('theme');
+        const fontParam = urlParams.get('font');
+        
+        if (themeParam && themes[themeParam]) {
+            selectedTheme = themeParam;
+        }
+        
+        if (fontParam) {
+            selectedFont = fontParam;
+        }
+        
         sonName = decodeURIComponent(sonName).trim();
         motherName = decodeURIComponent(motherName).trim();
-        
-        console.log('📝 البيانات المستلمة:', { son: sonName, mother: motherName });
+        personalMessage = decodeURIComponent(personalMessage).trim();
     } catch (e) {
-        console.log('خطأ في قراءة الرابط:', e);
         sonName = '';
         motherName = '';
+        personalMessage = '';
     }
 }
 
 function initFromURL() {
     getParamsFromURL();
     
-    // إذا كان فيه أسماء في الرابط
+    // إخفاء جميع الشاشات أولاً
+    screens.forEach(screen => screen.classList.remove('active'));
+    
     if (sonName || motherName) {
-        // إخفاء شاشة التسجيل
-        if (registerScreen) {
-            registerScreen.style.display = 'none';
-        }
-        
-        // تحديث جميع الأسماء
+        // فيه بيانات = الأم تفتح الموقع
+        document.getElementById('screenFingerprint').classList.add('active');
         updateAllNames();
         
-        // إظهار أول شاشة
-        showScreen(1);
-        
-        // محاولة تشغيل الموسيقى
-        setTimeout(() => {
-            playMusic();
-        }, 500);
-    } else {
-        // إذا ما فيه أسماء، نظهر شاشة التسجيل
-        if (registerScreen) {
-            registerScreen.style.display = 'flex';
+        // تطبيق الثيم والخط المخزن
+        if (selectedTheme) {
+            const theme = themes[selectedTheme];
+            document.documentElement.style.setProperty('--primary', theme.primary);
+            document.documentElement.style.setProperty('--secondary', theme.secondary);
+            document.documentElement.style.setProperty('--accent1', theme.accent1);
+            document.documentElement.style.setProperty('--accent2', theme.accent2);
         }
+        
+        if (selectedFont) {
+            document.body.classList.add(`font-${selectedFont}`);
+        }
+    } else {
+        // ما فيه بيانات = الابن يفتح الموقع
+        document.getElementById('screenRegister').classList.add('active');
+        
+        // تطبيق الثيم الافتراضي على شاشة التسجيل
+        const theme = themes['theme1'];
+        document.documentElement.style.setProperty('--primary', theme.primary);
+        document.documentElement.style.setProperty('--secondary', theme.secondary);
+        document.documentElement.style.setProperty('--accent1', theme.accent1);
+        document.documentElement.style.setProperty('--accent2', theme.accent2);
     }
 }
 
@@ -99,439 +343,357 @@ function updateAllNames() {
     const displaySon = sonName || 'ابنك';
     const displayMother = motherName || 'أمي';
     
-    // تحديث الشاشة 1
     safeSetText('motherNameDisplay', displayMother);
     safeSetText('sonNameDisplay', displaySon);
-    
-    // تحديث الشاشة 2
     safeSetText('motherNameCake', displayMother);
-    
-    // تحديث الشاشة 3
     safeSetText('motherNameLetter', displayMother);
-    safeSetText('signatureName', displaySon);
-    
-    // تحديث الشاشة 4
+    safeSetText('signatureNameDetailed', displaySon);
+    safeSetText('motherNameWishes', displayMother);
     safeSetText('motherNameFinal', displayMother);
-    safeSetText('motherNameFooter', displayMother);
+    safeSetText('personalSignature', displaySon);
     
-    // بناء محتوى الرسالة
+    // بناء نص الرسالة
     buildLetterContent(displaySon, displayMother);
 }
 
-function safeSetText(elementId, text) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.textContent = text;
-    }
+function safeSetText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
 }
 
 function buildLetterContent(son, mother) {
-    const letterBody = document.getElementById('letterBody');
+    const letterBody = document.getElementById('letterBodyDetailed');
     if (!letterBody) return;
     
     letterBody.innerHTML = `
-        <p class="greeting-line">${mother} الغالية... يا أغلى الناس،</p>
-        
-        <p>كل سنة وأنتِ طيبة وبخير، وكل سنة وأنا أشوف النور في عيونك وأفرح. حقيقي كلمات الدنيا كلها ما توفيك حقك، بس حبيت أكتب لك اللي في قلبي.</p>
-        
-        <div class="heart-divider">
-            <i class="fas fa-heart"></i>
-            <i class="fas fa-heart"></i>
-            <i class="fas fa-heart"></i>
-        </div>
-        
-        <p>يا ${mother}... والله إني كل ما أشوفك اتذكر كم تعبتي عشاني، وكم سهرتِ الليالي عشان أرتاح، وكم دعوة دعيتيها لي وما كنت أدري عنها. كل هذا في قلبي ومحتفظ فيه.</p>
-        
-        <div class="memory-box">
-            <i class="fas fa-quote-right"></i>
-            <p>" يا رب زي ما فرحتيني في صغري، أنا أبي أشوفك تفرحي فيا وأنا كبيرة "</p>
-        </div>
-        
-        <p>أبي أتمنى لك من كل قلبي:</p>
-        
-        <ul class="wishes-list">
-            <li><i class="fas fa-check-circle"></i> طول العمر والصحة والعافية</li>
-            <li><i class="fas fa-check-circle"></i> إنك دايمًا مبسوطة ومبتسمة</li>
-            <li><i class="fas fa-check-circle"></i> إن ربنا يخليك لي ولا يحرمني منك أبدًا</li>
-            <li><i class="fas fa-check-circle"></i> إنك تشوفي أولادك وأحفادك ناجحين وفرحانين</li>
-        </ul>
-        
-        <p>يا ${mother}... أنتِ الأساس، أنتِ السند، أنتِ الحضن الدافي اللي كل ما ضاقت الدنيا بلقاه. الله لا يحرمني منك ولا من دعواتك.</p>
+        <p class="greeting">${mother} الغالية،</p>
+        <p>كل سنة وأنتِ طيبة وبخير. كل سنة وأنا أشوف النور في عيونك وأفرح. كلمات الدنيا كلها ما توفيك حقك.</p>
+        <p>يا ${mother}، والله إني كل ما أشوفك أتذكر كم تعبتي عشاني. كم سهرتِ الليالي عشان أرتاح. كم دعوة دعيتيها لي وما كنت أدري عنها.</p>
+        <p class="quote">" يا رب زي ما فرحتيني في صغري، أنا أبي أشوفك تفرحي فيا "</p>
+        <p>أنتِ الأساس، أنتِ السند، أنتِ الحضن الدافي. الله لا يحرمني منك ولا من دعواتك.</p>
     `;
-    
-    // تحديث الاقتباس النهائي
-    const finalQuote = document.getElementById('finalQuote');
-    if (finalQuote) {
-        finalQuote.innerHTML = `" أمي... يا أول كلمة نطقتها، وآخر كلمة رح أقولها "`;
-    }
 }
 
 // ==================== التنقل بين الشاشات ====================
-function showScreen(screenNumber) {
-    // إخفاء جميع الشاشات
-    screens.forEach(screen => {
-        screen.classList.remove('active');
-    });
+function goToScreen(screenNumber) {
+    screens.forEach(screen => screen.classList.remove('active'));
     
-    // إظهار الشاشة المطلوبة
-    const targetScreen = document.getElementById(`screen${screenNumber}`);
-    if (targetScreen) {
-        targetScreen.classList.add('active');
-        currentScreen = screenNumber;
-        updateProgressTracker();
+    if (screenNumber === 1) document.getElementById('screen1').classList.add('active');
+    else if (screenNumber === 2) document.getElementById('screen2').classList.add('active');
+    else if (screenNumber === 3) document.getElementById('screen3').classList.add('active');
+    else if (screenNumber === 4) document.getElementById('screen4').classList.add('active');
+    else if (screenNumber === 5) document.getElementById('screen5').classList.add('active');
+    
+    updateTrackerDots(screenNumber);
+    playSound('transition');
+}
+
+function updateTrackerDots(screenNumber) {
+    const dots = document.querySelectorAll('.tracker-dot-compact');
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    if (screenNumber === 1) dots[0]?.classList.add('active');
+    else if (screenNumber === 2) dots[1]?.classList.add('active');
+    else if (screenNumber === 3) dots[2]?.classList.add('active');
+    else if (screenNumber === 5) dots[3]?.classList.add('active');
+    else if (screenNumber === 4) dots[4]?.classList.add('active');
+}
+
+function startMotherJourney() {
+    playSound('magic');
+    playMusic();
+    
+    screens.forEach(screen => screen.classList.remove('active'));
+    document.getElementById('screen1').classList.add('active');
+}
+
+function startJourneyAfterFingerprint() {
+    playSound('transition');
+    goToScreen(2);
+}
+
+// ==================== الأدعية ====================
+function showDua(index) {
+    const duas = [
+        "🤲 اللهم اطّل عمرها في طاعتك، واغسل قلبها باليقين والرضا",
+        "🤲 اللهم أبدل تعبها راحة، وحزنها فرحًا، ودموعها ابتسامة",
+        "🤲 اللهم اجعلني قرة عينها، وسندها في الدنيا، ورفيقها في الجنة"
+    ];
+    
+    document.getElementById('duaMessage').textContent = duas[index];
+    clickedDua[index] = true;
+    
+    playSound('magic');
+    
+    if (clickedDua.every(v => v === true)) {
+        if (goToFinalBtn) goToFinalBtn.style.display = 'inline-flex';
+        showNotification('✨ فتحتي كل الأدعية');
     }
 }
 
-function goToScreen(screenNumber) {
-    if (screenNumber < 1 || screenNumber > 4) return;
-    showScreen(screenNumber);
-    playSound('transition');
+// ==================== القلب المتنامي ====================
+function growHeart() {
+    heartClickCount++;
+    
+    if (heartClickCount <= 8) {
+        if (heartCounter) heartCounter.textContent = `${heartClickCount}/8`;
+        
+        const scale = 1 + (heartClickCount * 0.15);
+        if (growingHeart) growingHeart.style.transform = `scale(${scale})`;
+        if (heartCircle) heartCircle.style.transform = `scale(${1 + (heartClickCount * 0.05)})`;
+        
+        playSound('click');
+        
+        if (heartClickCount === 8) {
+            setTimeout(() => {
+                goToScreen(4);
+            }, 500);
+        }
+    }
 }
 
-function startJourney() {
-    playSound('transition');
-    showNotification('🌸 يلا نبدأ الرحلة الحلوة');
+// ==================== انفجار القلب النهائي ====================
+function explodeFinalHeart() {
+    const heart = document.getElementById('colorfulHeart');
+    const finalBox = document.getElementById('finalMagicBox');
+    
+    if (heart) heart.style.display = 'none';
+    
+    // كونفيتي
+    for (let i = 0; i < 100; i++) {
+        createConfetti();
+    }
+    
+    playSound('win');
+    
     setTimeout(() => {
-        goToScreen(2);
-    }, 500);
+        if (finalBox) {
+            finalBox.style.display = 'block';
+            
+            const msgDisplay = document.getElementById('personalMessageDisplay');
+            if (msgDisplay) {
+                msgDisplay.textContent = personalMessage || 'أمي الغالية... أنتِ كل شيء في حياتي. كلماتي ما توفيك حقك، بس حبي كبير قد الدنيا.';
+            }
+        }
+    }, 800);
 }
 
+function createConfetti() {
+    const confetti = document.createElement('div');
+    confetti.style.position = 'fixed';
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.top = '-10px';
+    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+    confetti.style.height = confetti.style.width;
+    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    confetti.style.borderRadius = '50%';
+    confetti.style.animation = 'rain ' + (Math.random() * 2 + 2) + 's linear';
+    confetti.style.zIndex = '10000';
+    
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 4000);
+}
+
+// ==================== مطر القلوب ====================
+function rainHearts() {
+    for (let i = 0; i < 70; i++) {
+        const heart = document.createElement('div');
+        heart.style.position = 'fixed';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.top = '-50px';
+        heart.style.fontSize = (Math.random() * 30 + 15) + 'px';
+        heart.style.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        heart.innerHTML = ['❤️', '💖', '💝', '💕', '💗'][Math.floor(Math.random() * 5)];
+        heart.style.animation = 'rain ' + (Math.random() * 3 + 2) + 's linear';
+        heart.style.zIndex = '10000';
+        
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+    }
+    
+    playSound('magic');
+}
+
+// ==================== إعادة الرحلة ====================
 function restartJourney() {
     // إعادة تعيين الشمعات
-    candlesLit = 3;
-    if (candlesLeftSpan) {
-        candlesLeftSpan.textContent = candlesLit;
-    }
+    candlesLit = 4;
+    if (candlesLeftSpan) candlesLeftSpan.textContent = candlesLit;
     
-    // إعادة إظهار الشمعات
-    document.querySelectorAll('.flame.lit').forEach(flame => {
-        flame.classList.remove('hidden');
+    document.querySelectorAll('.candle').forEach(candle => {
+        candle.style.animation = '';
+        candle.style.opacity = '1';
+    });
+    
+    document.querySelectorAll('.flame').forEach(flame => {
+        flame.style.display = 'block';
+        flame.classList.add('lit');
     });
     
     // إخفاء رسالة الكعكة
-    if (afterCakeMessage) {
-        afterCakeMessage.classList.remove('show');
-    }
+    if (afterCakeMessage) afterCakeMessage.style.opacity = '0';
     
-    // العودة للشاشة الأولى
-    showScreen(1);
-    showNotification('💝 من البداية... من جديد');
-}
-
-// ==================== إنشاء الشمعات ====================
-function createCandles() {
-    if (!candlesWrapper) return;
+    // إعادة القلب المتنامي
+    heartClickCount = 0;
+    if (heartCounter) heartCounter.textContent = '0/8';
+    if (growingHeart) growingHeart.style.transform = 'scale(1)';
+    if (heartCircle) heartCircle.style.transform = 'scale(1)';
     
-    candlesWrapper.innerHTML = '';
-
-    for (let i = 1; i <= 3; i++) {
-        const candle = document.createElement('div');
-        candle.className = 'candle';
-        candle.setAttribute('onclick', `blowCandle(this, ${i})`);
-
-        candle.innerHTML = `
-            <div class="candle-body"></div>
-            <div class="wick"></div>
-            <div class="flame lit" id="flame${i}">
-                <div class="flame-inner"></div>
-            </div>
-        `;
-
-        candlesWrapper.appendChild(candle);
-    }
-
-    updateCandlesCounter();
-}
-
-function blowCandle(candleElement, candleNumber) {
-    const flame = document.getElementById(`flame${candleNumber}`);
+    // إعادة الأدعية
+    clickedDua = [false, false, false];
+    if (goToFinalBtn) goToFinalBtn.style.display = 'none';
+    const duaMsg = document.getElementById('duaMessage');
+    if (duaMsg) duaMsg.textContent = '✨ انتظرين تضغطين على الورد ✨';
     
-    if (!flame || !flame.classList.contains('lit')) return;
+    // إعادة الختام
+    const finalHeart = document.getElementById('colorfulHeart');
+    const finalBox = document.getElementById('finalMagicBox');
     
-    flame.classList.remove('lit');
-    flame.classList.add('hidden');
-    candlesLit--;
+    if (finalHeart) finalHeart.style.display = 'block';
+    if (finalBox) finalBox.style.display = 'none';
     
-    playSound('blow');
-    createSmoke(candleElement);
-    updateCandlesCounter();
-    showNotification(`🕯️ أطفأتي الشمعة ${candleNumber}`);
-
-    if (candlesLit === 0 && afterCakeMessage) {
-        setTimeout(() => {
-            afterCakeMessage.classList.add('show');
-            playSound('win');
-            showNotification('🎉 مبروك! أطفأتي كل الشمعات');
-        }, 500);
-    }
-}
-
-function updateCandlesCounter() {
-    if (candlesLeftSpan) {
-        candlesLeftSpan.textContent = candlesLit;
-    }
-}
-
-function createSmoke(candleElement) {
-    const smoke = document.createElement('div');
-    smoke.style.cssText = `
-        position: absolute;
-        width: 15px;
-        height: 30px;
-        background: linear-gradient(to top, rgba(150,150,150,0.5), transparent);
-        border-radius: 50%;
-        top: -30px;
-        left: 50%;
-        transform: translateX(-50%);
-        filter: blur(3px);
-        animation: smokeRise 1s forwards;
-        pointer-events: none;
-    `;
-
-    candleElement.appendChild(smoke);
-
-    setTimeout(() => {
-        if (smoke.parentNode) {
-            smoke.remove();
-        }
-    }, 1000);
-}
-
-// ==================== إنشاء قلوب متحركة ====================
-function createFloatingHearts() {
-    const container = document.getElementById('floatingHearts');
-    if (!container) return;
-
-    for (let i = 0; i < 30; i++) {
-        const heart = document.createElement('div');
-        heart.className = 'heart-particle';
-        heart.innerHTML = '❤️';
-        
-        const size = Math.random() * 20 + 10;
-        const left = Math.random() * 100;
-        const duration = Math.random() * 10 + 8;
-        const delay = Math.random() * 5;
-        
-        heart.style.cssText = `
-            font-size: ${size}px;
-            left: ${left}%;
-            animation: floatUp ${duration}s linear ${delay}s infinite;
-        `;
-        
-        container.appendChild(heart);
-    }
-}
-
-// ==================== مؤشر التقدم ====================
-function updateProgressTracker() {
-    const screenNames = ['الاستقبال', 'الكعكة', 'الرسالة', 'الختام'];
-    const indicator = document.getElementById('screenIndicator');
-
-    document.querySelectorAll('.tracker-dot').forEach((dot, index) => {
-        if (index + 1 === currentScreen) {
-            dot.classList.add('active');
-        } else {
-            dot.classList.remove('active');
-        }
-    });
-
-    if (indicator) {
-        indicator.textContent = screenNames[currentScreen - 1];
-    }
-}
-
-function togglePanel() {
-    const panel = document.getElementById('controlPanel');
-    if (panel) {
-        panel.classList.toggle('collapsed');
-    }
+    // العودة لشاشة البصمة
+    screens.forEach(screen => screen.classList.remove('active'));
+    document.getElementById('screenFingerprint').classList.add('active');
 }
 
 // ==================== إدارة الموسيقى ====================
 function playMusic() {
     if (!bgMusic) return;
-    
-    bgMusic.volume = 0.5;
-    bgMusic.play()
-        .then(() => {
-            musicPlaying = true;
-            updateMusicButton();
-            console.log('🎵 الموسيقى تشغل');
-        })
-        .catch(e => {
-            console.log('🎵 الموسيقى تحتاج تفاعل:', e);
-            musicPlaying = false;
-            updateMusicButton();
-        });
+    bgMusic.volume = 0.4;
+    bgMusic.play().catch(() => {});
+    musicPlaying = true;
+    if (musicIcon) musicIcon.className = 'fas fa-volume-up';
 }
 
 function pauseMusic() {
     if (!bgMusic) return;
-    
     bgMusic.pause();
     musicPlaying = false;
-    updateMusicButton();
-    console.log('🔇 الموسيقى متوقفة');
+    if (musicIcon) musicIcon.className = 'fas fa-music';
 }
 
 function toggleMusic() {
-    if (musicPlaying) {
-        pauseMusic();
-    } else {
-        playMusic();
-    }
-}
-
-function updateMusicButton() {
-    if (!musicBtn) return;
-    
-    const icon = musicBtn.querySelector('i');
-    if (icon) {
-        icon.className = musicPlaying ? 'fas fa-volume-up' : 'fas fa-volume-mute';
-    }
+    if (musicPlaying) pauseMusic();
+    else playMusic();
 }
 
 // ==================== إنشاء الرابط ====================
 function generateLink() {
-    const sonInput = document.getElementById('sonName');
-    const motherInput = document.getElementById('motherName');
+    const son = document.getElementById('sonName')?.value.trim();
+    const mother = document.getElementById('motherName')?.value.trim();
+    const msg = document.getElementById('personalMessage')?.value.trim();
     
-    if (!sonInput || !motherInput) return;
-    
-    const son = sonInput.value.trim();
-    const mother = motherInput.value.trim();
-    
-    if (!son || !mother) {
-        alert('الرجاء كتابة الاسمين كاملين');
+    if (!son || !mother || !msg) {
+        alert('الرجاء كتابة جميع الحقول');
         return;
     }
     
-    // تنظيف الأسماء للتأكد من صلاحيتها للرابط
     const cleanSon = encodeURIComponent(son);
     const cleanMother = encodeURIComponent(mother);
+    const cleanMsg = encodeURIComponent(msg);
     
-    // بناء الرابط
+    // إضافة الثيم والخط للرابط
     const baseUrl = window.location.href.split('?')[0];
-    const link = `${baseUrl}?from=${cleanSon}&to=${cleanMother}`;
+    const link = `${baseUrl}?from=${cleanSon}&to=${cleanMother}&msg=${cleanMsg}&theme=${selectedTheme}&font=${selectedFont}`;
     
-    // عرض الرابط
     const generatedLink = document.getElementById('generatedLink');
     const linkBox = document.getElementById('linkBox');
     
-    if (generatedLink) {
-        generatedLink.textContent = link;
-    }
+    if (generatedLink) generatedLink.textContent = link;
+    if (linkBox) linkBox.style.display = 'block';
     
-    if (linkBox) {
-        linkBox.style.display = 'block';
-    }
-    
-    showNotification('✅ تم إنشاء الرابط بنجاح');
+    showNotification('✅ تم إنشاء الرابط');
 }
 
 function copyLink() {
-    const generatedLink = document.getElementById('generatedLink');
-    if (!generatedLink) return;
+    const link = document.getElementById('generatedLink')?.textContent;
+    if (!link) return;
     
-    const link = generatedLink.textContent;
-    
-    // محاولة النسخ
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(link)
-            .then(() => {
-                showNotification('📋 تم نسخ الرابط');
-            })
-            .catch(() => {
-                fallbackCopy(link);
-            });
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(link).then(() => showNotification('📋 تم النسخ'));
     } else {
-        fallbackCopy(link);
+        const textarea = document.createElement('textarea');
+        textarea.value = link;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showNotification('📋 تم النسخ');
     }
-}
-
-function fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    showNotification('📋 تم نسخ الرابط');
 }
 
 function previewSite() {
-    const sonInput = document.getElementById('sonName');
-    const motherInput = document.getElementById('motherName');
+    const son = document.getElementById('sonName')?.value.trim();
+    const mother = document.getElementById('motherName')?.value.trim();
+    const msg = document.getElementById('personalMessage')?.value.trim();
     
-    if (!sonInput || !motherInput) return;
-    
-    const son = sonInput.value.trim();
-    const mother = motherInput.value.trim();
-    
-    if (!son || !mother) return;
+    if (!son || !mother || !msg) return;
     
     sonName = son;
     motherName = mother;
+    personalMessage = msg;
     
     updateAllNames();
     
-    if (registerScreen) {
-        registerScreen.style.display = 'none';
+    // تطبيق الثيم والخط على المعاينة
+    if (selectedTheme) {
+        const theme = themes[selectedTheme];
+        document.documentElement.style.setProperty('--primary', theme.primary);
+        document.documentElement.style.setProperty('--secondary', theme.secondary);
+        document.documentElement.style.setProperty('--accent1', theme.accent1);
+        document.documentElement.style.setProperty('--accent2', theme.accent2);
     }
     
-    showScreen(1);
-    playMusic();
+    if (selectedFont) {
+        document.body.className = '';
+        document.body.classList.add(`font-${selectedFont}`);
+    }
+    
+    screens.forEach(screen => screen.classList.remove('active'));
+    document.getElementById('screenFingerprint').classList.add('active');
 }
 
-// ==================== الأصوات ====================
+// ==================== لوحة التحكم ====================
+function togglePanel() {
+    const content = document.getElementById('panelContent');
+    if (content) {
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+        } else {
+            content.style.display = 'none';
+        }
+    }
+}
+
+// ==================== الأصوات والإشعارات ====================
 function playSound(type) {
     try {
-        const soundMap = {
+        const sounds = {
             'blow': 'https://assets.mixkit.co/sfx/preview/mixkit-candle-blow-738.mp3',
             'win': 'https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3',
             'transition': 'https://assets.mixkit.co/sfx/preview/mixkit-soft-click-555.mp3',
-            'magic': 'https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-3090.mp3'
+            'magic': 'https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-3090.mp3',
+            'click': 'https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3'
         };
-
-        if (soundMap[type]) {
-            const sound = new Audio(soundMap[type]);
-            sound.volume = 0.3;
-            sound.play().catch(e => console.log('صوت غير متاح:', e));
+        
+        if (sounds[type]) {
+            new Audio(sounds[type]).play().catch(() => {});
         }
-    } catch (e) {
-        console.log('خطأ في تشغيل الصوت:', e);
-    }
+    } catch (e) {}
 }
 
-// ==================== الإشعارات ====================
 function showNotification(message) {
-    // حذف أي إشعار سابق
-    const oldNotification = document.querySelector('.notification');
-    if (oldNotification) {
-        oldNotification.remove();
-    }
+    const old = document.querySelector('.notification');
+    if (old) old.remove();
     
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.textContent = message;
+    document.body.appendChild(notif);
+    
     setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'slideDown 0.5s ease reverse';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 500);
-        }
+        notif.style.animation = 'slideDown 0.5s ease reverse';
+        setTimeout(() => notif.remove(), 500);
     }, 2500);
-}
-
-// ==================== دالة مساعدة للتأكد من وجود العناصر ====================
-function ensureElement(id, callback) {
-    const element = document.getElementById(id);
-    if (element) {
-        callback(element);
-    }
 }
